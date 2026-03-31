@@ -12,6 +12,22 @@ const titles = [
   'Security Engineer','Site Reliability Engineer','Platform Engineer',
 ]
 
+const interestPool = [
+  'Open source','Hiking','Chess','Photography','Gaming','Cooking','Reading','Cycling',
+  'Travel','Music','Painting','Podcasting','Blogging','Yoga','Running','Bouldering',
+  'Board games','Astronomy','Home automation','3D printing',
+]
+
+const certPool = [
+  'AWS Solutions Architect','AWS Developer Associate','AWS SysOps Administrator',
+  'Google Cloud Professional','GCP Associate Cloud Engineer','Azure Administrator',
+  'Certified Kubernetes Administrator (CKA)','Certified Kubernetes Application Developer (CKAD)',
+  'HashiCorp Terraform Associate','Docker Certified Associate',
+  'MongoDB Certified Developer','Oracle Java SE Certified',
+  'Certified Ethical Hacker (CEH)','CompTIA Security+','CISSP',
+  'Scrum Master (PSM I)','PMP','Google UX Design Certificate',
+]
+
 const skillPool = [
   'JavaScript','TypeScript','Python','Go','Rust','Java','C#','Ruby','PHP','Swift',
   'React','Vue','Angular','Next.js','Svelte','Node.js','Express','FastAPI','Django','Laravel',
@@ -48,13 +64,15 @@ function randomProfile() {
   const name  = `${pick(firstNames)} ${pick(lastNames)}`
   const title = pick(titles)
   const bio   = pick(bioTemplates)(name, title)
-  const skills = pickMany(skillPool, 3, 8).join(', ')
+  const skills         = pickMany(skillPool, 3, 8).join(', ')
+  const interests      = Math.random() > 0.2 ? pickMany(interestPool, 2, 5).join(', ') : null
+  const certifications = Math.random() > 0.4 ? pickMany(certPool, 1, 3).join(', ') : null
   const email  = `${name.toLowerCase().replace(' ', '.')}${rand(1,99)}@example.com`
   const github   = Math.random() > 0.3 ? `https://github.com/${name.toLowerCase().replace(' ','')}` : null
   const linkedin = Math.random() > 0.4 ? `https://linkedin.com/in/${name.toLowerCase().replace(' ','-')}` : null
   const website  = Math.random() > 0.6 ? `https://${name.toLowerCase().replace(' ','')} .dev` : null
   const status   = pick(statuses)
-  return { name, title, bio, skills, email, github, linkedin, website, status }
+  return { name, title, bio, skills, interests, certifications, email, github, linkedin, website, status }
 }
 
 async function seed() {

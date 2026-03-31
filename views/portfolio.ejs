@@ -43,6 +43,28 @@
       </div>
     </section>
 
+    <% if (portfolio.interests) { %>
+    <section class="mb-6">
+      <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">Interests</h2>
+      <div class="flex flex-wrap gap-2">
+        <% portfolio.interests.split(',').forEach(item => { %>
+          <span class="bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-sm"><%= item.trim() %></span>
+        <% }) %>
+      </div>
+    </section>
+    <% } %>
+
+    <% if (portfolio.certifications) { %>
+    <section class="mb-6">
+      <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">Certifications</h2>
+      <div class="flex flex-wrap gap-2">
+        <% portfolio.certifications.split(',').forEach(cert => { %>
+          <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">🎓 <%= cert.trim() %></span>
+        <% }) %>
+      </div>
+    </section>
+    <% } %>
+
     <section>
       <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">Contact & Links</h2>
       <ul class="space-y-2 text-sm">

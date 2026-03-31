@@ -13,26 +13,31 @@ const pool = mysql.createPool({
 async function init() {
   await pool.execute(`
     CREATE TABLE IF NOT EXISTS portfolios (
-      id         INT AUTO_INCREMENT PRIMARY KEY,
-      name       VARCHAR(255) NOT NULL,
-      title      VARCHAR(255) NOT NULL,
-      bio        TEXT NOT NULL,
-      skills     TEXT NOT NULL,
-      email      VARCHAR(255) NOT NULL,
-      github     VARCHAR(500),
-      linkedin   VARCHAR(500),
-      website    VARCHAR(500),
-      status     ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
-      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      id               INT AUTO_INCREMENT PRIMARY KEY,
+      name             VARCHAR(255) NOT NULL,
+      title            VARCHAR(255) NOT NULL,
+      bio              TEXT NOT NULL,
+      skills           TEXT NOT NULL,
+      interests        TEXT,
+      certifications   TEXT,
+      email            VARCHAR(255) NOT NULL,
+      github           VARCHAR(500),
+      linkedin         VARCHAR(500),
+      website          VARCHAR(500),
+      status           ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+      created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )
   `)
+  // Migrate existing tables that predate these columns
+  await pool.execute(`ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS interests      TEXT AFTER skills`)
+  await pool.execute(`ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS certifications TEXT AFTER interests`)
 }
 
-async function create({ name, title, bio, skills, email, github, linkedin, website }) {
+async function create({ name, title, bio, skills, interests, certifications, email, github, linkedin, website }) {
   const [result] = await pool.execute(
-    `INSERT INTO portfolios (name, title, bio, skills, email, github, linkedin, website)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [name, title, bio, skills, email, github, linkedin, website]
+    `INSERT INTO portfolios (name, title, bio, skills, interests, certifications, email, github, linkedin, website)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, title, bio, skills, interests, certifications, email, github, linkedin, website]
   )
   return result.insertId
 }

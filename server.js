@@ -36,13 +36,14 @@ app.get('/submit', (req, res) => {
 
 app.post('/submit', async (req, res, next) => {
   try {
-    const { name, title, bio, skills, email, github, linkedin, website } = req.body
+    const { name, title, bio, skills, interests, certifications, email, github, linkedin, website } = req.body
     if (!name || !title || !bio || !skills || !email) {
       return res.render('submit', { error: 'Please fill in all required fields.', values: req.body })
     }
     const id = await db.create({
-      name, title, bio, skills, email,
-      github: github || null, linkedin: linkedin || null, website: website || null
+      name, title, bio, skills,
+      interests: interests || null, certifications: certifications || null,
+      email, github: github || null, linkedin: linkedin || null, website: website || null
     })
     res.redirect(`/portfolio/${id}?submitted=1`)
   } catch (err) { next(err) }
