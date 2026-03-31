@@ -61,8 +61,9 @@
           </div>
           <p class="text-sm text-gray-600 line-clamp-3"><%= p.bio %></p>
           <div class="mt-4 flex flex-wrap gap-1">
-            <% p.skills.split(',').slice(0, 3).forEach(skill => { %>
-              <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full"><%= skill.trim().split(':')[0].trim() %></span>
+            <% const levelCls = { '1': 'bg-gray-100 text-gray-500', '2': 'bg-blue-50 text-blue-600', '3': 'bg-indigo-50 text-indigo-700', '4': 'bg-violet-50 text-violet-700' } %>
+          <% p.skills.split(',').slice(0, 3).forEach(skill => { const parts = skill.trim().split(':'); const sName = parts[0].trim(); const sLevel = parts[1] ? parts[1].trim() : null %>
+              <span class="text-xs px-2 py-0.5 rounded-full <%= sLevel && levelCls[sLevel] ? levelCls[sLevel] : 'bg-indigo-50 text-indigo-700' %>"><%= sName %></span>
             <% }) %>
           </div>
         </a>
