@@ -1,0 +1,95 @@
+<% title = 'Skills Report' %>
+<%- include('partials/header') %>
+
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Skills Report</h1>
+      <p class="text-sm text-gray-500 mt-1">Skill distribution across <%= total %> approved portfolio<%= total !== 1 ? 's' : '' %></p>
+    </div>
+    <a href="/manager" class="text-sm text-gray-500 hover:text-gray-800 border border-gray-300 px-3 py-1.5 rounded-lg">
+      ← Dashboard
+    </a>
+  </div>
+
+  <% if (total === 0) { %>
+    <div class="text-center py-20 text-gray-400">No approved portfolios yet.</div>
+  <% } else { %>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+      <!-- Pie chart -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6">
+        <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Distribution</h2>
+        <div class="relative" style="height:320px">
+          <canvas id="skillsChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6">
+        <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Breakdown</h2>
+        <div class="overflow-y-auto max-h-80">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-gray-400 border-b border-gray-100">
+                <th class="pb-2 font-medium">Skill</th>
+                <th class="pb-2 font-medium text-right">Count</th>
+                <th class="pb-2 font-medium text-right">Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% const totalSkills = data.reduce((a, b) => a + b, 0) %>
+              <% labels.forEach((label, i) => { %>
+                <tr class="border-b border-gray-50 hover:bg-gray-50">
+                  <td class="py-2 text-gray-700"><%= label %></td>
+                  <td class="py-2 text-right text-gray-900 font-medium"><%= data[i] %></td>
+                  <td class="py-2 text-right text-gray-400"><%= Math.round(data[i] / totalSkills * 100) %>%</td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  <% } %>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const labels = <%- JSON.stringify(labels) %>
+  const data   = <%- JSON.stringify(data) %>
+
+  const palette = [
+    '#6366f1','#10b981','#f59e0b','#ef4444','#3b82f6',
+    '#8b5cf6','#ec4899','#14b8a6','#f97316','#84cc16',
+    '#06b6d4','#a855f7','#e11d48','#0ea5e9','#d97706',
+  ]
+  const colors = labels.map((_, i) => palette[i % palette.length])
+
+  new Chart(document.getElementById('skillsChart'), {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: colors, borderWidth: 1, borderColor: '#fff' }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { size: 12 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0)
+              const pct = Math.round(ctx.parsed / total * 100)
+              return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`
+            }
+          }
+        }
+      }
+    }
+  })
+</script>
+
+<%- include('partials/footer') %>

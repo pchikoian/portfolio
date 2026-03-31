@@ -7,11 +7,16 @@
       <h1 class="text-2xl font-bold text-gray-900">Manager Dashboard</h1>
       <p class="text-sm text-gray-500 mt-1">Review and manage portfolio submissions</p>
     </div>
-    <form method="POST" action="/manager/logout">
-      <button type="submit" class="text-sm text-gray-500 hover:text-gray-800 border border-gray-300 px-3 py-1.5 rounded-lg">
-        Sign Out
-      </button>
-    </form>
+    <div class="flex items-center gap-3">
+      <a href="/manager/report" class="text-sm text-indigo-600 hover:text-indigo-800 border border-indigo-200 px-3 py-1.5 rounded-lg">
+        Skills Report
+      </a>
+      <form method="POST" action="/manager/logout">
+        <button type="submit" class="text-sm text-gray-500 hover:text-gray-800 border border-gray-300 px-3 py-1.5 rounded-lg">
+          Sign Out
+        </button>
+      </form>
+    </div>
   </div>
 
   <div class="grid grid-cols-3 gap-4 mb-8">

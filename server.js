@@ -89,6 +89,23 @@ app.get('/manager', requireManager, async (req, res, next) => {
   } catch (err) { next(err) }
 })
 
+app.get('/manager/report', requireManager, async (req, res, next) => {
+  try {
+    const portfolios = await db.getApproved()
+    const freq = {}
+    for (const p of portfolios) {
+      p.skills.split(',').forEach(s => {
+        const skill = s.trim()
+        if (skill) freq[skill] = (freq[skill] || 0) + 1
+      })
+    }
+    const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1])
+    const labels = sorted.map(([k]) => k)
+    const data   = sorted.map(([, v]) => v)
+    res.render('report', { labels, data, total: portfolios.length })
+  } catch (err) { next(err) }
+})
+
 app.post('/manager/status', requireManager, async (req, res, next) => {
   try {
     const { id, status } = req.body
