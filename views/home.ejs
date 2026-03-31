@@ -1,16 +1,16 @@
-<% title = 'Browse Portfolios' %>
+<% title = 'Browse Talent Inventories' %>
 <% const skills = typeof allSkills !== 'undefined' ? allSkills : [] %>
 <%- include('partials/header') %>
 
 <div class="max-w-5xl mx-auto px-4 py-12">
   <div class="text-center mb-8">
-    <h1 class="text-4xl font-bold text-gray-900 mb-3">Discover Portfolios</h1>
-    <p class="text-gray-500 text-lg">Browse approved portfolios from talented professionals.</p>
+    <h1 class="text-4xl font-bold text-gray-900 mb-3">Discover Talent</h1>
+    <p class="text-gray-500 text-lg">Browse approved talent inventories from talented professionals.</p>
   </div>
 
   <% if (portfolios.length === 0) { %>
     <div class="text-center py-20 text-gray-400">
-      <p class="text-lg">No portfolios yet.</p>
+      <p class="text-lg">No talent inventories yet.</p>
       <a href="/submit" class="mt-4 inline-block text-indigo-600 hover:underline">Be the first to submit yours →</a>
     </div>
   <% } else { %>
@@ -69,7 +69,7 @@
       <% }) %>
     </div>
 
-    <p id="empty-msg" class="hidden text-center py-16 text-gray-400">No portfolios match your filter.</p>
+    <p id="empty-msg" class="hidden text-center py-16 text-gray-400">No talent inventories match your filter.</p>
 
   <% } %>
 </div>

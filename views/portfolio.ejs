@@ -4,17 +4,17 @@
 <div class="max-w-3xl mx-auto px-4 py-12">
   <% if (submitted) { %>
     <div class="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-3 text-sm">
-      Your portfolio has been submitted and is pending review. It will appear publicly once approved.
+      Your talent inventory has been submitted and is pending review. It will appear publicly once approved.
     </div>
   <% } %>
   <% if (portfolio.status === 'pending' && !submitted) { %>
     <div class="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg px-4 py-3 text-sm">
-      This portfolio is pending review and not yet publicly visible.
+      This talent inventory is pending review and not yet publicly visible.
     </div>
   <% } %>
   <% if (portfolio.status === 'rejected') { %>
     <div class="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 text-sm">
-      This portfolio was not approved.
+      This talent inventory was not approved.
     </div>
   <% } %>
 
@@ -91,7 +91,7 @@
   </div>
 
   <div class="mt-6">
-    <a href="/" class="text-sm text-gray-500 hover:text-gray-700">← Back to all portfolios</a>
+    <a href="/" class="text-sm text-gray-500 hover:text-gray-700">← Back to all talent inventories</a>
   </div>
 </div>
 
