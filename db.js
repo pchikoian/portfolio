@@ -58,4 +58,10 @@ async function updateStatus(id, status) {
   await pool.execute('UPDATE portfolios SET status = ? WHERE id = ?', [status, id])
 }
 
-module.exports = { init, create, getById, getApproved, getAll, updateStatus }
+async function truncate() {
+  const [result] = await pool.execute('DELETE FROM portfolios')
+  await pool.execute('ALTER TABLE portfolios AUTO_INCREMENT = 1')
+  return { count: result.affectedRows }
+}
+
+module.exports = { init, create, getById, getApproved, getAll, updateStatus, truncate }
