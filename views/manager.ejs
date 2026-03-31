@@ -1,0 +1,85 @@
+<% title = 'Manager Dashboard' %>
+<%- include('partials/header') %>
+
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Manager Dashboard</h1>
+      <p class="text-sm text-gray-500 mt-1">Review and manage portfolio submissions</p>
+    </div>
+    <form method="POST" action="/manager/logout">
+      <button type="submit" class="text-sm text-gray-500 hover:text-gray-800 border border-gray-300 px-3 py-1.5 rounded-lg">
+        Sign Out
+      </button>
+    </form>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4 mb-8">
+    <div class="border rounded-xl px-5 py-4 bg-yellow-50 text-yellow-700 border-yellow-200">
+      <p class="text-2xl font-bold"><%= counts.pending %></p>
+      <p class="text-sm">Pending</p>
+    </div>
+    <div class="border rounded-xl px-5 py-4 bg-green-50 text-green-700 border-green-200">
+      <p class="text-2xl font-bold"><%= counts.approved %></p>
+      <p class="text-sm">Approved</p>
+    </div>
+    <div class="border rounded-xl px-5 py-4 bg-red-50 text-red-700 border-red-200">
+      <p class="text-2xl font-bold"><%= counts.rejected %></p>
+      <p class="text-sm">Rejected</p>
+    </div>
+  </div>
+
+  <% if (portfolios.length === 0) { %>
+    <p class="text-center text-gray-400 py-16">No submissions yet.</p>
+  <% } else { %>
+    <div class="space-y-4">
+      <% portfolios.forEach(p => { %>
+        <div class="bg-white border border-gray-200 rounded-xl p-6">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-3 mb-1">
+                <a href="/portfolio/<%= p.id %>" class="font-semibold text-gray-900 hover:text-indigo-600"><%= p.name %></a>
+                <span class="text-xs border px-2 py-0.5 rounded-full capitalize
+                  <%= p.status === 'approved' ? 'bg-green-50 text-green-700 border-green-200' :
+                      p.status === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' :
+                      'bg-yellow-50 text-yellow-700 border-yellow-200' %>">
+                  <%= p.status %>
+                </span>
+              </div>
+              <p class="text-sm text-gray-500 mb-1"><%= p.title %> — <%= p.email %></p>
+              <p class="text-sm text-gray-600 line-clamp-2"><%= p.bio %></p>
+              <p class="text-xs text-gray-400 mt-2">
+                Skills: <%= p.skills %> &bull; Submitted: <%= new Date(p.created_at).toLocaleDateString() %>
+              </p>
+            </div>
+            <div class="flex flex-col gap-2 shrink-0">
+              <% if (p.status !== 'approved') { %>
+                <form method="POST" action="/manager/status">
+                  <input type="hidden" name="id" value="<%= p.id %>">
+                  <input type="hidden" name="status" value="approved">
+                  <button type="submit" class="text-xs bg-green-600 text-white px-3 py-1.5 rounded-lg hover:bg-green-700 w-full">Approve</button>
+                </form>
+              <% } %>
+              <% if (p.status !== 'rejected') { %>
+                <form method="POST" action="/manager/status">
+                  <input type="hidden" name="id" value="<%= p.id %>">
+                  <input type="hidden" name="status" value="rejected">
+                  <button type="submit" class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-200 w-full">Reject</button>
+                </form>
+              <% } %>
+              <% if (p.status !== 'pending') { %>
+                <form method="POST" action="/manager/status">
+                  <input type="hidden" name="id" value="<%= p.id %>">
+                  <input type="hidden" name="status" value="pending">
+                  <button type="submit" class="text-xs text-gray-500 px-3 py-1.5 rounded-lg hover:bg-gray-100 w-full border border-gray-200">Reset</button>
+                </form>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,40 @@
+<% title = 'Browse Portfolios' %>
+<%- include('partials/header') %>
+
+<div class="max-w-5xl mx-auto px-4 py-12">
+  <div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-3">Discover Portfolios</h1>
+    <p class="text-gray-500 text-lg">Browse approved portfolios from talented professionals.</p>
+  </div>
+
+  <% if (portfolios.length === 0) { %>
+    <div class="text-center py-20 text-gray-400">
+      <p class="text-lg">No portfolios yet.</p>
+      <a href="/submit" class="mt-4 inline-block text-indigo-600 hover:underline">Be the first to submit yours →</a>
+    </div>
+  <% } else { %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% portfolios.forEach(p => { %>
+        <a href="/portfolio/<%= p.id %>" class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow block">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-lg">
+              <%= p.name[0].toUpperCase() %>
+            </div>
+            <div>
+              <p class="font-semibold text-gray-900"><%= p.name %></p>
+              <p class="text-sm text-gray-500"><%= p.title %></p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-600 line-clamp-3"><%= p.bio %></p>
+          <div class="mt-4 flex flex-wrap gap-1">
+            <% p.skills.split(',').slice(0, 3).forEach(skill => { %>
+              <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full"><%= skill.trim() %></span>
+            <% }) %>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
