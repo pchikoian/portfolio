@@ -72,7 +72,7 @@ function randomProfile() {
   const linkedin = Math.random() > 0.4 ? `https://linkedin.com/in/${name.toLowerCase().replace(' ','-')}` : null
   const website  = Math.random() > 0.6 ? `https://${name.toLowerCase().replace(' ','')} .dev` : null
   const status   = pick(statuses)
-  return { name, title, bio, skills, interests, certifications, email, github, linkedin, website, status }
+  return { name, title, bio, skills, interests, certifications, projects: null, products: null, email, github, linkedin, website, status }
 }
 
 async function seed() {
