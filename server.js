@@ -23,7 +23,10 @@ app.use(session({
 app.get('/', async (req, res, next) => {
   try {
     const portfolios = await db.getApproved()
-    res.render('home', { portfolios })
+    const allSkills = [...new Set(
+      portfolios.flatMap(p => p.skills.split(',').map(s => s.trim()).filter(Boolean))
+    )].sort()
+    res.render('home', { portfolios, allSkills })
   } catch (err) { next(err) }
 })
 
