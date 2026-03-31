@@ -30,10 +30,13 @@
     </div>
 
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Skills <span class="text-red-500">*</span></label>
-      <input name="skills" type="text" required value="<%= values.skills || '' %>" placeholder="React, TypeScript, Node.js"
-        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-      <p class="text-xs text-gray-400 mt-1">Comma-separated list</p>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Skills <span class="text-red-500">*</span></label>
+      <div id="skills-container" class="space-y-2 mb-2"></div>
+      <button type="button" id="add-skill-btn"
+        class="text-xs text-indigo-600 hover:text-indigo-800 border border-indigo-200 px-3 py-1.5 rounded-lg">
+        + Add skill
+      </button>
+      <input type="hidden" name="skills" id="skills-hidden" value="<%= values.skills || '' %>">
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -48,6 +51,25 @@
         <input name="certifications" type="text" value="<%= values.certifications || '' %>" placeholder="AWS Solutions Architect, CKA"
           class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
         <p class="text-xs text-gray-400 mt-1">Comma-separated list</p>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Projects</label>
+      <textarea name="projects" rows="3" placeholder="e.g. Built a real-time chat app with WebSockets; Led migration of monolith to microservices..."
+        class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"><%= values.projects || '' %></textarea>
+      <p class="text-xs text-gray-400 mt-1">Separate multiple projects with a semicolon</p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Products <span class="text-gray-400 font-normal">(up to 3)</span></label>
+      <div class="space-y-2">
+        <input name="product_1" type="text" value="<%= values.product_1 || '' %>" placeholder="Product 1 name or description"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <input name="product_2" type="text" value="<%= values.product_2 || '' %>" placeholder="Product 2 name or description"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <input name="product_3" type="text" value="<%= values.product_3 || '' %>" placeholder="Product 3 name or description"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
       </div>
     </div>
 
@@ -81,5 +103,70 @@
     </button>
   </form>
 </div>
+
+<script>
+  const LEVELS = { '1': 'Awareness', '2': 'Practitioner', '3': 'Proficient', '4': 'Expert' }
+
+  function addSkillRow(name, level) {
+    const container = document.getElementById('skills-container')
+    const row = document.createElement('div')
+    row.className = 'skill-row flex gap-2 items-center'
+
+    const nameInput = document.createElement('input')
+    nameInput.type = 'text'
+    nameInput.placeholder = 'e.g. React'
+    nameInput.value = name || ''
+    nameInput.className = 'flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+
+    const levelSelect = document.createElement('select')
+    levelSelect.className = 'border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+    const blankOpt = document.createElement('option')
+    blankOpt.value = ''
+    blankOpt.textContent = '— Level —'
+    levelSelect.appendChild(blankOpt)
+    Object.entries(LEVELS).forEach(([val, label]) => {
+      const opt = document.createElement('option')
+      opt.value = val
+      opt.textContent = `${val} – ${label}`
+      if (String(level) === val) opt.selected = true
+      levelSelect.appendChild(opt)
+    })
+
+    const removeBtn = document.createElement('button')
+    removeBtn.type = 'button'
+    removeBtn.textContent = '×'
+    removeBtn.className = 'text-gray-400 hover:text-red-500 text-xl leading-none px-1'
+    removeBtn.addEventListener('click', () => row.remove())
+
+    row.append(nameInput, levelSelect, removeBtn)
+    container.appendChild(row)
+  }
+
+  // Pre-populate from existing values (on validation error re-render)
+  const existing = document.getElementById('skills-hidden').value
+  if (existing) {
+    existing.split(',').forEach(s => {
+      const [n, l] = s.trim().split(':')
+      addSkillRow(n.trim(), l || '')
+    })
+  } else {
+    addSkillRow()
+  }
+
+  document.getElementById('add-skill-btn').addEventListener('click', () => addSkillRow())
+
+  document.querySelector('form').addEventListener('submit', function () {
+    const skills = []
+    document.querySelectorAll('.skill-row').forEach(row => {
+      const name = row.querySelector('input').value.trim()
+      const level = row.querySelector('select').value
+      if (name) skills.push(level ? `${name}:${level}` : name)
+    })
+    document.getElementById('skills-hidden').value = skills.join(',')
+    if (!skills.length) {
+      document.getElementById('skills-hidden').value = ''
+    }
+  })
+</script>
 
 <%- include('partials/footer') %>

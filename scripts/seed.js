@@ -64,7 +64,7 @@ function randomProfile() {
   const name  = `${pick(firstNames)} ${pick(lastNames)}`
   const title = pick(titles)
   const bio   = pick(bioTemplates)(name, title)
-  const skills         = pickMany(skillPool, 3, 8).join(', ')
+  const skills         = pickMany(skillPool, 3, 8).map(s => `${s}:${rand(1,4)}`).join(',')
   const interests      = Math.random() > 0.2 ? pickMany(interestPool, 2, 5).join(', ') : null
   const certifications = Math.random() > 0.4 ? pickMany(certPool, 1, 3).join(', ') : null
   const email  = `${name.toLowerCase().replace(' ', '.')}${rand(1,99)}@example.com`

@@ -31,13 +31,15 @@ async function init() {
   // Migrate existing tables that predate these columns
   await pool.execute(`ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS interests      TEXT AFTER skills`)
   await pool.execute(`ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS certifications TEXT AFTER interests`)
+  await pool.execute(`ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS projects       TEXT AFTER certifications`)
+  await pool.execute(`ALTER TABLE portfolios ADD COLUMN IF NOT EXISTS products       TEXT AFTER projects`)
 }
 
-async function create({ name, title, bio, skills, interests, certifications, email, github, linkedin, website }) {
+async function create({ name, title, bio, skills, interests, certifications, projects, products, email, github, linkedin, website }) {
   const [result] = await pool.execute(
-    `INSERT INTO portfolios (name, title, bio, skills, interests, certifications, email, github, linkedin, website)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [name, title, bio, skills, interests, certifications, email, github, linkedin, website]
+    `INSERT INTO portfolios (name, title, bio, skills, interests, certifications, projects, products, email, github, linkedin, website)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [name, title, bio, skills, interests, certifications, projects, products, email, github, linkedin, website]
   )
   return result.insertId
 }

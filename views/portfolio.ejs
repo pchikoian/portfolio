@@ -36,9 +36,18 @@
 
     <section class="mb-6">
       <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">Skills</h2>
+      <%
+        const levelMeta = { '1': { label: 'Awareness', cls: 'bg-gray-100 text-gray-500' }, '2': { label: 'Practitioner', cls: 'bg-blue-50 text-blue-600' }, '3': { label: 'Proficient', cls: 'bg-indigo-50 text-indigo-700' }, '4': { label: 'Expert', cls: 'bg-violet-50 text-violet-700' } }
+      %>
       <div class="flex flex-wrap gap-2">
-        <% portfolio.skills.split(',').forEach(skill => { %>
-          <span class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm"><%= skill.trim() %></span>
+        <% portfolio.skills.split(',').forEach(entry => { %>
+          <% const parts = entry.trim().split(':'); const sName = parts[0].trim(); const sLevel = parts[1] ? parts[1].trim() : null %>
+          <span class="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm">
+            <%= sName %>
+            <% if (sLevel && levelMeta[sLevel]) { %>
+              <span class="text-xs px-1.5 py-0.5 rounded-full font-medium <%= levelMeta[sLevel].cls %>"><%= levelMeta[sLevel].label %></span>
+            <% } %>
+          </span>
         <% }) %>
       </div>
     </section>
@@ -62,6 +71,38 @@
           <span class="bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm">🎓 <%= cert.trim() %></span>
         <% }) %>
       </div>
+    </section>
+    <% } %>
+
+    <% if (portfolio.products) { %>
+    <section class="mb-6">
+      <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">Products</h2>
+      <div class="flex flex-col gap-2">
+        <% portfolio.products.split(';').forEach((product, i) => { %>
+          <% if (product.trim()) { %>
+            <div class="flex items-center gap-3 bg-violet-50 border border-violet-100 rounded-lg px-4 py-2 text-sm text-violet-800">
+              <span class="font-semibold text-violet-400"><%= i + 1 %>.</span>
+              <%= product.trim() %>
+            </div>
+          <% } %>
+        <% }) %>
+      </div>
+    </section>
+    <% } %>
+
+    <% if (portfolio.projects) { %>
+    <section class="mb-6">
+      <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">Projects</h2>
+      <ul class="space-y-2">
+        <% portfolio.projects.split(';').forEach(project => { %>
+          <% if (project.trim()) { %>
+            <li class="flex items-start gap-2 text-sm text-gray-700">
+              <span class="mt-1 text-indigo-400">▸</span>
+              <%= project.trim() %>
+            </li>
+          <% } %>
+        <% }) %>
+      </ul>
     </section>
     <% } %>
 

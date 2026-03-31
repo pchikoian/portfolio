@@ -48,7 +48,7 @@
           class="portfolio-card bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow block"
           data-name="<%= p.name.toLowerCase() %>"
           data-title="<%= p.title.toLowerCase() %>"
-          data-skills="<%= p.skills.toLowerCase() %>"
+          data-skills="<%= p.skills.split(',').map(s => s.trim().split(':')[0].trim().toLowerCase()).join(',') %>"
         >
           <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-lg">
@@ -62,7 +62,7 @@
           <p class="text-sm text-gray-600 line-clamp-3"><%= p.bio %></p>
           <div class="mt-4 flex flex-wrap gap-1">
             <% p.skills.split(',').slice(0, 3).forEach(skill => { %>
-              <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full"><%= skill.trim() %></span>
+              <span class="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full"><%= skill.trim().split(':')[0].trim() %></span>
             <% }) %>
           </div>
         </a>

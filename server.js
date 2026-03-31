@@ -24,7 +24,7 @@ app.get('/', async (req, res, next) => {
   try {
     const portfolios = await db.getApproved()
     const allSkills = [...new Set(
-      portfolios.flatMap(p => p.skills.split(',').map(s => s.trim()).filter(Boolean))
+      portfolios.flatMap(p => p.skills.split(',').map(s => s.trim().split(':')[0].trim()).filter(Boolean))
     )].sort()
     res.render('home', { portfolios, allSkills })
   } catch (err) { next(err) }
@@ -36,13 +36,17 @@ app.get('/submit', (req, res) => {
 
 app.post('/submit', async (req, res, next) => {
   try {
-    const { name, title, bio, skills, interests, certifications, email, github, linkedin, website } = req.body
+    const { name, title, bio, skills, interests, certifications, projects, email, github, linkedin, website } = req.body
     if (!name || !title || !bio || !skills || !email) {
       return res.render('submit', { error: 'Please fill in all required fields.', values: req.body })
     }
+    const productsList = [req.body.product_1, req.body.product_2, req.body.product_3]
+      .map(p => (p || '').trim()).filter(Boolean)
+    const products = productsList.length ? productsList.join(';') : null
     const id = await db.create({
       name, title, bio, skills,
-      interests: interests || null, certifications: certifications || null,
+      interests: interests || null, certifications: certifications || null, projects: projects || null,
+      products,
       email, github: github || null, linkedin: linkedin || null, website: website || null
     })
     res.redirect(`/portfolio/${id}?submitted=1`)
@@ -102,7 +106,7 @@ app.get('/manager/report', requireManager, async (req, res, next) => {
       for (const p of portfolios) {
         if (!p[field]) continue
         p[field].split(',').forEach(s => {
-          const v = s.trim()
+          const v = s.trim().split(':')[0].trim()
           if (v) freq[v] = (freq[v] || 0) + 1
         })
       }
