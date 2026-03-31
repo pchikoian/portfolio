@@ -20,32 +20,37 @@ app.use(session({
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
 
-app.get('/', (req, res) => {
-  const portfolios = db.getApproved()
-  res.render('home', { portfolios })
+app.get('/', async (req, res, next) => {
+  try {
+    const portfolios = await db.getApproved()
+    res.render('home', { portfolios })
+  } catch (err) { next(err) }
 })
 
 app.get('/submit', (req, res) => {
   res.render('submit', { error: null, values: {} })
 })
 
-app.post('/submit', (req, res) => {
-  const { name, title, bio, skills, email, github, linkedin, website } = req.body
-  if (!name || !title || !bio || !skills || !email) {
-    return res.render('submit', {
-      error: 'Please fill in all required fields.',
-      values: req.body
+app.post('/submit', async (req, res, next) => {
+  try {
+    const { name, title, bio, skills, email, github, linkedin, website } = req.body
+    if (!name || !title || !bio || !skills || !email) {
+      return res.render('submit', { error: 'Please fill in all required fields.', values: req.body })
+    }
+    const id = await db.create({
+      name, title, bio, skills, email,
+      github: github || null, linkedin: linkedin || null, website: website || null
     })
-  }
-  const id = db.create({ name, title, bio, skills, email,
-    github: github || null, linkedin: linkedin || null, website: website || null })
-  res.redirect(`/portfolio/${id}?submitted=1`)
+    res.redirect(`/portfolio/${id}?submitted=1`)
+  } catch (err) { next(err) }
 })
 
-app.get('/portfolio/:id', (req, res) => {
-  const portfolio = db.getById(Number(req.params.id))
-  if (!portfolio) return res.status(404).render('404')
-  res.render('portfolio', { portfolio, submitted: req.query.submitted === '1' })
+app.get('/portfolio/:id', async (req, res, next) => {
+  try {
+    const portfolio = await db.getById(Number(req.params.id))
+    if (!portfolio) return res.status(404).render('404')
+    res.render('portfolio', { portfolio, submitted: req.query.submitted === '1' })
+  } catch (err) { next(err) }
 })
 
 // ─── Manager Routes ───────────────────────────────────────────────────────────
@@ -72,24 +77,37 @@ function requireManager(req, res, next) {
   next()
 }
 
-app.get('/manager', requireManager, (req, res) => {
-  const portfolios = db.getAll()
-  const counts = {
-    pending: portfolios.filter(p => p.status === 'pending').length,
-    approved: portfolios.filter(p => p.status === 'approved').length,
-    rejected: portfolios.filter(p => p.status === 'rejected').length,
-  }
-  res.render('manager', { portfolios, counts })
+app.get('/manager', requireManager, async (req, res, next) => {
+  try {
+    const portfolios = await db.getAll()
+    const counts = {
+      pending:  portfolios.filter(p => p.status === 'pending').length,
+      approved: portfolios.filter(p => p.status === 'approved').length,
+      rejected: portfolios.filter(p => p.status === 'rejected').length,
+    }
+    res.render('manager', { portfolios, counts })
+  } catch (err) { next(err) }
 })
 
-app.post('/manager/status', requireManager, (req, res) => {
-  const { id, status } = req.body
-  if (!['approved', 'rejected', 'pending'].includes(status)) return res.redirect('/manager')
-  db.updateStatus(Number(id), status)
-  res.redirect('/manager')
+app.post('/manager/status', requireManager, async (req, res, next) => {
+  try {
+    const { id, status } = req.body
+    if (!['approved', 'rejected', 'pending'].includes(status)) return res.redirect('/manager')
+    await db.updateStatus(Number(id), status)
+    res.redirect('/manager')
+  } catch (err) { next(err) }
 })
 
-app.listen(PORT, () => {
-  console.log(`Portfolio Hub running at http://localhost:${PORT}`)
-  console.log(`Manager login: http://localhost:${PORT}/manager/login  (password: ${MANAGER_PASSWORD})`)
-})
+// ─── Start ────────────────────────────────────────────────────────────────────
+
+db.init()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Portfolio Hub running at http://localhost:${PORT}`)
+      console.log(`Manager login: http://localhost:${PORT}/manager/login  (password: ${MANAGER_PASSWORD})`)
+    })
+  })
+  .catch(err => {
+    console.error('Failed to connect to database:', err.message)
+    process.exit(1)
+  })

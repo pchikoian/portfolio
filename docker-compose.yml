@@ -9,7 +9,36 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: portfolio
+      DB_PASSWORD: ${DB_PASSWORD:-portfolio}
+      DB_NAME: portfolio
       MANAGER_PASSWORD: ${MANAGER_PASSWORD:-admin123}
       SESSION_SECRET: ${SESSION_SECRET:-dev-secret-change-in-prod}
     command: node --watch server.js
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
+
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MARIADB_DATABASE: portfolio
+      MARIADB_USER: portfolio
+      MARIADB_PASSWORD: ${DB_PASSWORD:-portfolio}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  db_data:
