@@ -26,13 +26,15 @@
       <div class="flex flex-wrap gap-2 items-center">
         <span class="text-xs text-gray-400 font-medium uppercase tracking-wide mr-1">Skills:</span>
         <button
-          onclick="filterSkill(null, this)"
-          class="skill-btn active text-xs px-3 py-1 rounded-full border border-indigo-300 bg-indigo-600 text-white transition-colors"
+          id="btn-all"
+          onclick="toggleAll()"
+          class="skill-btn text-xs px-3 py-1 rounded-full border border-indigo-300 bg-indigo-600 text-white transition-colors"
         >All</button>
         <% skills.forEach(skill => { %>
           <button
-            onclick="filterSkill('<%= skill %>', this)"
+            onclick="toggleSkill('<%= skill %>', this)"
             class="skill-btn text-xs px-3 py-1 rounded-full border border-gray-200 bg-white text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+            data-skill="<%= skill %>"
           ><%= skill %></button>
         <% }) %>
       </div>
@@ -73,17 +75,41 @@
 </div>
 
 <script>
-  let activeSkill = null
+  const activeSkills = new Set()
 
-  function filterSkill(skill, btn) {
-    activeSkill = skill
-    document.querySelectorAll('.skill-btn').forEach(b => {
-      b.classList.remove('active', 'bg-indigo-600', 'text-white', 'border-indigo-300')
+  function toggleSkill(skill, btn) {
+    if (activeSkills.has(skill)) {
+      activeSkills.delete(skill)
+      btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-300')
+      btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200')
+    } else {
+      activeSkills.add(skill)
+      btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-300')
+      btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200')
+    }
+    syncAllButton()
+    applyFilters()
+  }
+
+  function toggleAll() {
+    activeSkills.clear()
+    document.querySelectorAll('.skill-btn[data-skill]').forEach(b => {
+      b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-300')
       b.classList.add('bg-white', 'text-gray-600', 'border-gray-200')
     })
-    btn.classList.add('active', 'bg-indigo-600', 'text-white', 'border-indigo-300')
-    btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200')
+    syncAllButton()
     applyFilters()
+  }
+
+  function syncAllButton() {
+    const allBtn = document.getElementById('btn-all')
+    const isAll = activeSkills.size === 0
+    allBtn.classList.toggle('bg-indigo-600', isAll)
+    allBtn.classList.toggle('text-white', isAll)
+    allBtn.classList.toggle('border-indigo-300', isAll)
+    allBtn.classList.toggle('bg-white', !isAll)
+    allBtn.classList.toggle('text-gray-600', !isAll)
+    allBtn.classList.toggle('border-gray-200', !isAll)
   }
 
   document.getElementById('search')?.addEventListener('input', applyFilters)
@@ -96,8 +122,9 @@
       const matchesSearch = !query ||
         card.dataset.name.includes(query) ||
         card.dataset.title.includes(query)
-      const matchesSkill = !activeSkill ||
-        card.dataset.skills.split(',').map(s => s.trim()).includes(activeSkill.toLowerCase())
+      const cardSkills = card.dataset.skills.split(',').map(s => s.trim())
+      const matchesSkill = activeSkills.size === 0 ||
+        [...activeSkills].every(s => cardSkills.includes(s.toLowerCase()))
       const show = matchesSearch && matchesSkill
       card.style.display = show ? '' : 'none'
       if (show) visible++
