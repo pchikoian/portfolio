@@ -1,5 +1,6 @@
 const express = require('express')
 const session = require('express-session')
+const validator = require('validator');
 const path = require('path')
 const db = require('./db')
 
@@ -26,7 +27,10 @@ app.get('/', async (req, res, next) => {
     const allSkills = [...new Set(
       portfolios.flatMap(p => p.skills.split(',').map(s => s.trim().split(':')[0].trim()).filter(Boolean))
     )].sort()
-    res.render('home', { portfolios, allSkills })
+    const allTitles = [...new Set(
+      portfolios.map(p => p.title).filter(Boolean)
+    )].sort()
+    res.render('home', { portfolios, allSkills, allTitles })
   } catch (err) { next(err) }
 })
 
@@ -37,9 +41,34 @@ app.get('/submit', (req, res) => {
 app.post('/submit', async (req, res, next) => {
   try {
     const { name, title, bio, skills, interests, certifications, projects, email, github, linkedin, website } = req.body
-    if (!name || !title || !bio || !skills || !email) {
-      return res.render('submit', { error: 'Please fill in all required fields.', values: req.body })
+    const errors = []
+
+    // Basic validation for required fields
+    if (!name) errors.push('Full Name is required.')
+    if (!title) errors.push('Professional Title is required.')
+    if (!bio) errors.push('Bio is required.')
+    if (!skills) errors.push('Skills are required.')
+    if (!email) {
+      errors.push('Email is required.');
+    } else if (!validator.isEmail(email)) {
+      errors.push('Please enter a valid email address.');
     }
+
+    // Length constraints
+    if (name && name.length > 255) errors.push('Full Name cannot exceed 255 characters.')
+    if (title && title.length > 255) errors.push('Professional Title cannot exceed 255 characters.')
+    if (bio && bio.length > 1000) errors.push('Bio cannot exceed 1000 characters.')
+
+    // URL format validation (if provided)
+    const urlRegex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i
+    if (github && !validator.isURL(github)) errors.push('Please enter a valid GitHub URL.')
+    if (linkedin && !validator.isURL(linkedin)) errors.push('Please enter a valid LinkedIn URL.')
+    if (website && !validator.isURL(website)) errors.push('Please enter a valid Website URL.')
+
+    if (errors.length > 0) {
+      return res.render('submit', { error: errors.join(' '), values: req.body })
+    }
+
     const productsList = [req.body.product_1, req.body.product_2, req.body.product_3]
       .map(p => (p || '').trim()).filter(Boolean)
     const products = productsList.length ? productsList.join(';') : null
