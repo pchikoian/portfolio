@@ -27,7 +27,10 @@ app.get('/', async (req, res, next) => {
     const allSkills = [...new Set(
       portfolios.flatMap(p => p.skills.split(',').map(s => s.trim().split(':')[0].trim()).filter(Boolean))
     )].sort()
-    res.render('home', { portfolios, allSkills })
+    const allTitles = [...new Set(
+      portfolios.map(p => p.title).filter(Boolean)
+    )].sort()
+    res.render('home', { portfolios, allSkills, allTitles })
   } catch (err) { next(err) }
 })
 
